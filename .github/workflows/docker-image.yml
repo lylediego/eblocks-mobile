@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on: "push"
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build --pull --rm -f "Image/Dockerfile" -t flutterdevcontainer:${{ github.sha }} "Image"
+    
+    - name: Push docker image to ghcr.io
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: gdscparuluniversity
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - run: |
+        docker tag flutterdevcontainer:${{ github.sha }} ghcr.io/gdscparuluniversity/flutterdevcontainer:${{ github.sha }}
+        docker push ghcr.io/gdscparuluniversity/flutterdevcontainer:${{ github.sha }}
